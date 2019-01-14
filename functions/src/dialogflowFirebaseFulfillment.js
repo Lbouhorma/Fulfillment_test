@@ -14,6 +14,7 @@ const app = dialogflow()
 
 
 app.intent("Default Welcome Intent", conv => {
+        conv.ask("quelque chose");
         executeCommand();
         conv.ask('Sending a mail')
 });

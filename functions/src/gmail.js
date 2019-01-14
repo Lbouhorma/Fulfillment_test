@@ -3,20 +3,15 @@ var readline = require('readline');
 var google = require('googleapis').google;
 var base64url = require('base64url');
 var Base64 = require('js-base64').Base64;
-// If modifying these scopes, deconste your previously saved credentials
-// at TOKEN_DIR/gmail-nodejs.json
 var SCOPES = ['https://mail.google.com/'];
-// Change token directory to your system preference
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'gmail-nodejs.json';
-console.log(TOKEN_DIR, TOKEN_PATH);
 var gmail = google.gmail('v1');
-
 const secret={"installed":{"client_id":"586480029881-4a5khp4t8iobeo9gnpejp6lfviutjqv2.apps.googleusercontent.com","project_id":"voice-controller-57710","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://www.googleapis.com/oauth2/v3/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"z8UsiOmo7GKZux6sSangzEmS","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}
 
 function executeCommand() {
-    console.log("executing");
+    console.log("Et toi");
     authorize(secret, sendMessage);
 }
 
@@ -29,6 +24,7 @@ executeCommand();
 * @param {Object} credentials The authorization client credentials.
 * @param {function} callback The callback to call with the authorized client.
 */
+
 function authorize(credentials, callback) {
     var clientSecret = credentials.installed.client_secret;
     var clientId = credentials.installed.client_id;
@@ -36,16 +32,22 @@ function authorize(credentials, callback) {
     var OAuth2 = google.auth.OAuth2;
     var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, function (err, token) {
-        if (err) {
-            getNewToken(oauth2Client, callback);
-        }
-        else {
-            oauth2Client.credentials = JSON.parse(token);
-            callback(oauth2Client);
-        }
-    });
+    oauth2Client.credentials = {"access_token":"ya29.GltoBqJ-QesOaSJoxHQt8C3rbP6EQrxiRMiJgGiG-qpxMI1UI2vSEjaRDJX6lqy1ADsE6VR82M8BFh3cwfpJBMxB1R68OQ-9v2FJOkB7M7TRNs_r9SweKs_WjSZg","refresh_token":"1/XGhBeRzaCD5urhLnbSwef9Nl_9FQzyeuuX4oSu9YRWc","scope":"https://mail.google.com/","token_type":"Bearer","expiry_date":1543939550745};
+    callback(oauth2Client);
+    // fs.readFile(TOKEN_PATH, function (err, token) {
+    //     console.log(JSON.parse(token));
+    //     if (err) {
+    //         console.log('erreur token');
+    //         getNewToken(oauth2Client, callback);
+    //     }
+    //     else {
+    //         oauth2Client.credentials = JSON.parse(token);
+    //         callback(oauth2Client);
+    //     }
+    // });
 }
+
+
 /**
 * Get and store new token after prompting for user authorization, and then
 * execute the given callback with the authorized OAuth2 client.
@@ -74,6 +76,7 @@ function getNewToken(oauth2Client, callback) {
         });
     });
 }
+
 /**
 * Store token to disk be used in later program executions.
 *
@@ -91,6 +94,7 @@ function storeToken(token) {
     fs.writeFile(TOKEN_PATH, JSON.stringify(token));
     console.log('Token stored to ' + TOKEN_PATH);
 }
+
 /**
 * Get the recent email from your Gmail account
 *
@@ -137,6 +141,7 @@ function getRecentEmail(auth) {
         // Retreive the actual message using the message id
     });
 }
+
 var store_id = function (f, param) {
     var result = [];
     //new Array(param.length);
@@ -146,6 +151,7 @@ var store_id = function (f, param) {
     }
     return result;
 };
+
 /**
 * Retrieve Messages in user's mailbox matching query.
 *
@@ -177,6 +183,7 @@ function listLabels(auth) {
         }
     });
 }
+
 function makeBody(to, subject, message) {
     var email = 'To: "first last" <'
         + to +
@@ -187,6 +194,7 @@ function makeBody(to, subject, message) {
     var encodedMail = Base64.encodeURI(email);
     return encodedMail;
 }
+
 function sendMessage(auth) {
     console.log("sending message");
     /* Example of data */
@@ -201,20 +209,5 @@ function sendMessage(auth) {
             throw err;
         console.log(response);
     });
+    console.log('message sent');
 }
-module.exports = function sendMessage(auth) {
-    /* Example of data */
-    var to = 'lbouhorma@gmail.com';
-    var subject = 'Test Voice Controller 3';
-    var message = 'Ceci est un test.';
-    var encodedMail = makeBody(to, subject, message);
-    gmail.users.messages.send({ 'auth': auth, 'userId': 'me', 'resource': {
-            'raw': encodedMail
-        } }, function (err, response) {
-        if (err)
-            throw err;
-        console.log(response);
-    });
-};
-executeCommand();
-// export= executeCommand(); 
